@@ -12,6 +12,7 @@ os.environ['PYSPARK_DRIVER_PYTHON'] = sys.executable
 es = Elasticsearch(['https://ElasticsearchURL:9200'])
 
 
+#Predict the sentiment
 def sentiment(text):
     sentimentAnalyser = SentimentIntensityAnalyzer()
     sentiment = sentimentAnalyser.polarity_scores(text)
@@ -22,14 +23,14 @@ def sentiment(text):
     else:
         return "neutral"
 
-
+#Store the sentiment to elastic search with can be later visualized using Kibana
 def getSentiment(time, rdd):
     test = rdd.collect()
     for i in test:
         es.index(index="hash_tags_sentiment_analysis",
                  doc_type="tweet-sentiment-analysis", body=i)
 
-
+#Using spark streaming to get the data from kafka and preform sentiment analysis.
 if __name__ == "__main__":
     sc = SparkContext.getOrCreate()
     ssc = StreamingContext(sc, 20)
