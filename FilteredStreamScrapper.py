@@ -2,7 +2,7 @@ import json
 import requests
 from kafka import KafkaProducer
 
-bearer_token = "AAAAAAAAAAAAAAAAAAAAAMAMcAEAAAAAqhIZr%2FzNB8GVPayFJ%2Bn%2BSWMwpJA%3DDOBXm5plomeEKpxlWoLQMRNOY2ZP2xPeWBJsZGJUdCgrVUsJUv"
+bearer_token = "Your twitter bearer token"
 
 
 def bearer_oauth(r):
@@ -10,7 +10,7 @@ def bearer_oauth(r):
     r.headers["User-Agent"] = "v2FilteredStreamPython"
     return r
 
-
+# Get the rules set for the data streaming
 def get_rules():
     response = requests.get(
         "https://api.twitter.com/2/tweets/search/stream/rules", auth=bearer_oauth
@@ -23,7 +23,7 @@ def get_rules():
     print(json.dumps(response.json()))
     return response.json()
 
-
+# Delete the currently set rules
 def delete_all_rules(rules):
     if rules is None or "data" not in rules:
         return None
@@ -43,7 +43,7 @@ def delete_all_rules(rules):
         )
     print(json.dumps(response.json()))
 
-
+#Set new rule for the data streaming
 def set_rules():
     sample_rules = [
         {"value": "#BLM -is:retweet -is:reply", "tag": "BLM"}
@@ -62,6 +62,7 @@ def set_rules():
     print(json.dumps(response.json()))
 
 
+# Get the data stream from twitter
 def get_stream(prod):
     response = requests.get(
         "https://api.twitter.com/2/tweets/search/stream", auth=bearer_oauth, stream=True,
@@ -80,7 +81,7 @@ def get_stream(prod):
             print(text)
             publish_message(prod, 'BLM', text)
 
-
+# Connect to kafka producer to produce messages
 def connect_kafka_producer():
     _producer = None
     try:
@@ -93,7 +94,7 @@ def connect_kafka_producer():
     finally:
         return _producer
 
-
+#Publish message to kafka producer
 def publish_message(producer_instance, topic_name, value):
     try:
         key_bytes = bytes('foo', encoding='utf-8')
